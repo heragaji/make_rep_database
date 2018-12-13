@@ -45,13 +45,13 @@ realignerとdump-consensusの設定は、DocBase参照。
 
 `make_rep_database.sh -in input.fa -d output_directory -re realigner_directory -du dump-consensus_directory -top the_number_of_top_reads_to_use -it the_maximum_number_of_iterations_of_realigner -cov threshold_of_depth -int threshold_of_peak_interval -pe threshold_of_peak_coverage -cut threshold_of_cut_interval`
 
-今の仕様だと、`-in`の後に入力のFASTAファイルを書き、`-d`の後に出力ファイルを出すディレクトリを指定し、`-re`の後にrealignerのディレクトリを指定、`-du`の後にdump-consensusのディレクトリを指定、`-top`の後に長い順に上から何本をrepeat検出のreferenceとして使うかを指定、`-it`の後にrealignerを最大何回回すかを指定、`-cov`の後にカバレッジいくつ以上の領域をリピートとみなすかを指定、`-int`の後に何bp内のリードの終端のカバレッジを極大値とみなすかを指定、`-pe`の後にリードの終端の数がいくつ以上のとき、ピークとみなすかを指定、`-cut`の後にリピート領域の切断位置がそれぞれ何bp以上離れているかを指定する。(オプション多すぎるため、設定ファイルを用意したほうがよさそう。)
+今の仕様だと、`-in`の後に入力のFASTAファイルを書き、`-d`の後に出力ファイルを出すディレクトリを指定(絶対パス)し、`-re`の後にrealignerのディレクトリを指定、`-du`の後にdump-consensusのディレクトリを指定、`-top`の後に長い順に上から何本をrepeat検出のreferenceとして使うかを指定、`-it`の後にrealignerを最大何回回すかを指定、`-cov`の後にカバレッジいくつ以上の領域をリピートとみなすかを指定、`-int`の後に何bp内のリードの終端のカバレッジを極大値とみなすかを指定、`-pe`の後にリードの終端の数がいくつ以上のとき、ピークとみなすかを指定、`-cut`の後にリピート領域の切断位置がそれぞれ何bp以上離れているかを指定する。(オプション多すぎるため、設定ファイルを用意したほうがよさそう。)
 
-出力として、
+出力として、`-d`で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている)、top.fa,repeat.fa,top_vs_reads_sorted.bamが入る。この中のrepeat.faがrepeatのデータベースとなる。
 
 ## Installation
 
-    $ git clone https://github.com/b4b4r07/awesome-tool
+    $ git clone https://github.com/heragaji/make_rep_database.git
 
 ## Author
 
