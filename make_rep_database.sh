@@ -246,6 +246,7 @@ seqkit sort -lr ${reads_data} | seqkit head -n ${top} > top.fa
 top_reads=`seqkit seq -ni top.fa`
 /home/ozawat/local/src/minialign/minialign -x pacbio -f 0 -m 0.00001  top.fa ${reads_data}  -t16 | samtools view -Sb -F 4 | samtools sort > top_vs_reads_sorted.bam
 touch repeat.fa
+type > repeat.fa
 for ref in ${top_reads}
 do
   mkdir ${ref}
@@ -263,5 +264,6 @@ do
   seqkit subseq --bed ${ref}_vs_reads_cut.bed consensus_${ref}_vs_reads_realigned.fa > ${ref}_vs_reads_result_gapped.fa
   python ${src_dir}/remove_gap_from_fasta.py ${ref}_vs_reads_result_gapped.fa> ${ref}_vs_reads_result.fa
   cd ..
-  cat repeat.fa ./${ref}/${ref}_vs_reads_result.fa > repeat.fa
+  cat ./${ref}/${ref}_vs_reads_result.fa >> repeat.fa
 done
+python ${src_dir}/cal_cluster_size.py repeat.fa > cluster_size.csv
