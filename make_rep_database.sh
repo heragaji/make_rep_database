@@ -244,7 +244,7 @@ fi
 cd ${output_dir}
 seqkit sort -lr ${reads_data} | seqkit head -n ${top} > top.fa
 top_reads=`seqkit seq -ni top.fa`
-/home/ozawat/local/src/minialign/minialign -x pacbio -f 0 -m 0.00001  top.fa ${reads_data}  -t16 | samtools view -Sb -F 4 | samtools sort > top_vs_reads_sorted.bam
+minialign -x pacbio -f 0 -m 0.00001  top.fa ${reads_data}  -t16 | samtools view -Sb -F 4 | samtools sort > top_vs_reads_sorted.bam
 touch repeat.fa
 type > repeat.fa
 for ref in ${top_reads}
