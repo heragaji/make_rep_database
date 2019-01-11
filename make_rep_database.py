@@ -35,6 +35,7 @@ def command(dir,file,realigner,dump_consensus,top,iteration,coverage,interval,pe
     config["peak"] = peak
     config["cut"] = cut
     config["ref"] = top_id
+    config["src_dir"] = os.path.dirname(__file__)
     f = open('config.json','w')
     json.dump(config,f,indent=4)
     f.close()

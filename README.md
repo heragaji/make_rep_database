@@ -11,6 +11,7 @@ program of detecting and clustering repeat sequences from reads.
 - seqkit Version: 0.8.0
 - samtools Version: 1.7 Using htslib 1.7
 - minialign Version: 0.6.0-42-g4d6b274, Build: SSE4.1
+- snakemake Version: 5.4.0
 
 realignerとdump-consensusの設定は、ラボ内DocBase参照。
 
@@ -48,13 +49,13 @@ realignerとdump-consensusの設定は、ラボ内DocBase参照。
 
 今の仕様だと、
 
-- `-f` 入力のFASTAファイル
+- `-f` 入力のFASTAファイル(絶対パス)
 
 - `-d` 出力ファイルを出すディレクトリを指定(絶対パス)
 
-- `-r` realignerのディレクトリ
+- `-r` realignerのディレクトリ(絶対パス)
 
-- `-s` dump-consensusのディレクトリ
+- `-s` dump-consensusのディレクトリ(絶対パス)
 
 - `-t` 長い順に上から何本をrepeat検出のreferenceとして使うか
 
