@@ -40,36 +40,37 @@ realignerとdump-consensusの設定は、ラボ内DocBase参照。
 
     - biopython Version: 1.71
 
+    - click Version: 7.0
 
 ## Usage
 
-`make_rep_database.sh -in input.fa -d output_directory -re realigner_directory -du dump-consensus_directory -top the_number_of_top_reads_to_use -it the_maximum_number_of_iterations_of_realigner -cov threshold_of_depth -int threshold_of_peak_interval -pe threshold_of_peak_coverage -cut threshold_of_cut_interval`
+`make_rep_database.py -f input.fa -d output_directory -r realigner_directory -s dump-consensus_directory -t the_number_of_top_reads_to_use -i the_maximum_number_of_iterations_of_realigner -c threshold_of_depth -k threshold_of_peak_interval -p threshold_of_peak_coverage -l threshold_of_cut_interval`
 
 今の仕様だと、
 
-- `-in` 入力のFASTAファイル
+- `-f` 入力のFASTAファイル
 
 - `-d` 出力ファイルを出すディレクトリを指定(絶対パス)
 
-- `-re` realignerのディレクトリ
+- `-r` realignerのディレクトリ
 
-- `-du` dump-consensusのディレクトリ
+- `-s` dump-consensusのディレクトリ
 
-- `-top` 長い順に上から何本をrepeat検出のreferenceとして使うか
+- `-t` 長い順に上から何本をrepeat検出のreferenceとして使うか
 
-- `-it` realignerを最大何回回すか
+- `-i` realignerを最大何回回すか
 
-- `-cov` カバレッジいくつ以上の領域をリピートとみなすか
+- `-c` カバレッジいくつ以上の領域をリピートとみなすか
 
-- `-int` 何bp内のリードの終端のカバレッジを極大値とみなすか
+- `-k` 何bp内のリードの終端のカバレッジを極大値とみなすか
 
-- `-pe` リードの終端の数がいくつ以上のとき、ピークとみなすか
+- `-p` リードの終端の数がいくつ以上のとき、ピークとみなすか
 
-- `-cut` リピート領域の切断位置をそれぞれ何bp以上離すか
+- `-l` リピート領域の切断位置をそれぞれ何bp以上離すか
 
 (オプション多すぎるため、設定ファイルを用意したほうがよさそう。)
 
-出力として、`-d`で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている)、cluster_size.csv,top.fa,repeat.fa,top_vs_reads_sorted.bamが入る。この中のrepeat.faがrepeatのデータベースとなる。今のところ、clusterのサイズは全て0.01になっている。
+出力として、`-d`で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), cluster_size.csv, top.fa, repeat.fa,top_vs_reads_sorted.bam, config.json, .snakemake(snakemakeのログ等がア￥入る)が入る。この中のrepeat.faがrepeatのデータベースとなる。今のところ、clusterのサイズは全て0.01になっている。
 
 ## Installation
 
