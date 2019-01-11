@@ -41,37 +41,37 @@ realignerとdump-consensusの設定は、ラボ内DocBase参照。
 
     - biopython Version: 1.71
 
-    - click Version: 7.0
 
 ## Usage
 
-`make_rep_database.py -f input.fa -d output_directory -r realigner_directory -s dump-consensus_directory -t the_number_of_top_reads_to_use -i the_maximum_number_of_iterations_of_realigner -c threshold_of_depth -k threshold_of_peak_interval -p threshold_of_peak_coverage -l threshold_of_cut_interval`
+`snakemake --directory working_directory`
 
-今の仕様だと、
+作業ディレクトリに、`config.json`という名前のJSONファイルを作成する。  
+JSONファイルの中身は、
 
-- `-f` 入力のFASTAファイル(絶対パス)
-
-- `-d` 出力ファイルを出すディレクトリを指定(絶対パス)
-
-- `-r` realignerのディレクトリ(絶対パス)
-
-- `-s` dump-consensusのディレクトリ(絶対パス)
-
-- `-t` 長い順に上から何本をrepeat検出のreferenceとして使うか
-
-- `-i` realignerを最大何回回すか
-
-- `-c` カバレッジいくつ以上の領域をリピートとみなすか
-
-- `-k` 何bp内のリードの終端のカバレッジを極大値とみなすか
-
-- `-p` リードの終端の数がいくつ以上のとき、ピークとみなすか
-
-- `-l` リピート領域の切断位置をそれぞれ何bp以上離すか
+``` json
+{
+    "data": "入力のFASTAファイル(絶対パス)",
+    "output": "出力ファイルを出すディレクトリを指定(絶対パス)",
+    "realigner": "realignerのディレクトリ(絶対パス)",
+    "dump_consensus": "dump-consensusのディレクトリ(絶対パス)",
+    "top": "長い順に上から何本をrepeat検出のreferenceとして使うか",
+    "iteration": "realignerを最大何回回すか",
+    "coverage": "カバレッジいくつ以上の領域をリピートとみなすか",
+    "interval": "何bp内のリードの終端のカバレッジを極大値とみなすか",
+    "peak": "リードの終端の数がいくつ以上のとき、ピークとみなすか",
+    "cut": "リピート領域の切断位置をそれぞれ何bp以上離すか",
+    "src_dir": "Snakefileと同じ位置にある、srcフォルダを指定(絶対パス)"
+}
+```
 
 (オプション多すぎるため、設定ファイルを用意したほうがよさそう。)
 
-出力として、`-d`で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), cluster_size.csv, top.fa, repeat.fa,top_vs_reads_sorted.bam, config.json, .snakemake(snakemakeのログ等が入る)が入る。この中のrepeat.faがrepeatのデータベースとなる。今のところ、clusterのサイズは全て0.01になっている。
+出力として、"output"で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), cluster_size.csv, top.fa, repeat.fa,top_vs_reads_sorted.bam, config.jsonが入る。この中のrepeat.faがrepeatのデータベースとなる。今のところ、clusterのサイズは全て0.01になっている。
+作業ディレクトリには.snakemake(snakemakeのログ等が入る)が入る。
+
+Snakefile自体のパスをプログラム内で得られれば、最後の"src_dir"はいらないので、なんとかしたい。
+`--cores int`,`--qsub int`等でコア数やジョブの投入のオプションもできる。
 
 ## Installation
 

@@ -1,8 +1,15 @@
+import sys
+import subprocess
 import os
 
 configfile:
     "config.json"
 
+subprocess.call("seqkit sort -lr {reads_data} | seqkit head -n {top} > {output}/top.fa".format(reads_data=config['data'],top=config['top'],output=config['output']),shell = True)
+top_id = subprocess.check_output('seqkit seq -ni {output}/top.fa'.format(output=config['output']),shell = True).decode(encoding='utf-8').split()
+for id in top_id:
+    os.makedirs(config['output']+"/"+id, exist_ok=True)
+src_dir = os.path.dirname(__file__)+"/src"
 
 rule all:
     input:
@@ -155,7 +162,7 @@ rule each_result:
 
 rule repeat:
      input:
-         expand(config['output']+"/{ref}/{ref}_vs_reads_result_gapped.fa",ref=config['ref'])
+         expand(config['output']+"/{ref}/{ref}_vs_reads_result_gapped.fa",ref=top_id)
      output:
          config['output']+"/repeat.fa"
      shell:
@@ -169,6 +176,8 @@ rule cluster:
         config['output']+"/repeat.fa"
     output:
         config['output']+"/cluster_size.csv"
+    params:
+        src_dir = config['src_dir']
     shell:
         """
         python {params.src_dir}/cal_cluster_size.py {input} > {output}
