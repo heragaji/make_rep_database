@@ -71,7 +71,7 @@ realignerとdump-consensusの設定は、ラボ内DocBase参照。
 
 (オプション多すぎるため、設定ファイルを用意したほうがよさそう。)
 
-出力として、`-d`で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), cluster_size.csv, top.fa, repeat.fa,top_vs_reads_sorted.bam, config.json, .snakemake(snakemakeのログ等がア￥入る)が入る。この中のrepeat.faがrepeatのデータベースとなる。今のところ、clusterのサイズは全て0.01になっている。
+出力として、`-d`で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), cluster_size.csv, top.fa, repeat.fa,top_vs_reads_sorted.bam, config.json, .snakemake(snakemakeのログ等が入る)が入る。この中のrepeat.faがrepeatのデータベースとなる。今のところ、clusterのサイズは全て0.01になっている。
 
 ## Installation
 
