@@ -65,7 +65,7 @@ JSONファイルの中身は、
 }
 ```
 
-出力として、"output"で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), cluster_size.csv, top.fa, repeat.fa,top_vs_reads_sorted.bam, config.jsonが入る。この中のrepeat.faがrepeatのデータベースとなる。今のところ、clusterのサイズは全て0.01になっている。
+出力として、"output"で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), cluster_size.csv, top.fa, repeat.fa,top_vs_reads_sorted.bamが入る。この中のrepeat.faがrepeatのデータベースとなる。今のところ、clusterのサイズは全て0.01になっている。
 作業ディレクトリには.snakemake(snakemakeのログ等が入る)が入る。
 
 Snakefile自体のパスをプログラム内で得られれば、最後の"src_dir"はいらないので、なんとかしたい。
