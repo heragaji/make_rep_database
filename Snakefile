@@ -21,9 +21,10 @@ rule minialign:
         config['output']+"/top_vs_reads_sorted.bam"
     params:
         data = config['data']
+    threads: 16
     shell:
         """
-        /home/ozawat/local/src/minialign/minialign -x pacbio -f 0 -m 0.00001 {input.top} {params.data}  -t16 | samtools view -Sb -F 4 | samtools sort > {output}
+        /home/ozawat/local/src/minialign/minialign -x pacbio -f 0 -m 0.00001 {input.top} {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
         """
 
 rule realigner:
