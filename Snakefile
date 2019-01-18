@@ -9,11 +9,10 @@ subprocess.call("seqkit sort -lr {reads_data} | seqkit head -n {top} > {output}/
 top_id = subprocess.check_output('seqkit seq -ni {output}/top.fa'.format(output=config['output']),shell = True).decode(encoding='utf-8').split()
 for id in top_id:
     os.makedirs(config['output']+"/"+id, exist_ok=True)
-src_dir = os.path.dirname(__file__)+"/src"
 
 rule all:
     input:
-        config['output']+"/repeat.fa"
+        config['output']+"/cluster_size.csv"
 
 rule minialign:
     input:
