@@ -162,7 +162,7 @@ rule each_result:
 
 rule repeat:
      input:
-         expand(config['output']+"/{ref}/{ref}_vs_reads_result_gapped.fa",ref=top_id)
+         expand(config['output']+"/{ref}/{ref}_vs_reads_result.fa",ref=top_id)
      output:
          config['output']+"/repeat.fa"
      shell:
