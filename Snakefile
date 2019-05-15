@@ -149,9 +149,9 @@ rule gapped_result:
      shell:
          """
          if [ -s {input.bed} ] ;then
-            touch {output}
-         else
             seqkit subseq --bed {input.bed} {input.consensus} > {output}
+         else
+            touch {output}
          fi
          """
 
