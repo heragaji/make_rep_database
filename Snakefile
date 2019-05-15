@@ -148,7 +148,11 @@ rule gapped_result:
          config['output']+"/{ref}/{ref}_vs_reads_result_gapped.fa"
      shell:
          """
-         seqkit subseq --bed {input.bed} {input.consensus} > {output}
+         if [ -s {input.bed} ] ;then
+            touch {output}
+         else
+            seqkit subseq --bed {input.bed} {input.consensus} > {output}
+         fi
          """
 
 rule each_result:
