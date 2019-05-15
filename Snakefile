@@ -40,6 +40,9 @@ rule realigner:
 
     shell:
         """
+        if test -e {params.dir}/{wildcards.ref}/hoge; then
+            rm {params.dir}/{wildcards.ref}/hoge
+        fi
         mkfifo {params.dir}/{wildcards.ref}/hoge
         samtools view -h {input.bam} > {params.dir}/{wildcards.ref}/hoge &
         STACK_YAML={params.realigner}/stack.yaml stack exec -- realigner -i {params.it} {wildcards.ref} < {params.dir}/{wildcards.ref}/hoge | samtools view -Sb | samtools sort >  {params.dir}/{wildcards.ref}/{wildcards.ref}_vs_reads_realigned.bam
