@@ -24,7 +24,7 @@ rule minialign:
     threads: 16
     shell:
         """
-        /home/ozawat/local/src/minialign/minialign -x pacbio -f 0 -m 0.00001 {input.top} {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
+        minialign -x pacbio -f 0 -m 0.00001 {input.top} {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
         """
 
 rule realigner:
