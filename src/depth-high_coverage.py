@@ -12,7 +12,7 @@ wig_file = wiggelen.walk(open(wig_fname))
 # Set the beginning state 'LOW'.
 
 state = 'LOW'
-
+reference_name = None
 # Search and print regions.
 for reference, position, value in wig_file:
 	
@@ -39,6 +39,6 @@ for reference, position, value in wig_file:
 			print(str(reference_name) + '\t' + str(beg) + '\t' + str(end))
 			state = 'LOW'
 # Print the last region.
-if(reference_name != None):
+if(reference_name is not None):
 	print(str(reference_name) + '\t' + str(beg) + '\t' + str(end))
 
