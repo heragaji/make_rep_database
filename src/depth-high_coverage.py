@@ -39,6 +39,6 @@ for reference, position, value in wig_file:
 			print(str(reference_name) + '\t' + str(beg) + '\t' + str(end))
 			state = 'LOW'
 # Print the last region.
-if(reference_name is not None):
+if(reference_name is not None) and (state == 'HIGH'):
 	print(str(reference_name) + '\t' + str(beg) + '\t' + str(end))
 
