@@ -63,6 +63,7 @@ JSONファイルの中身は、
     "interval": "何bp内のリードの終端のカバレッジを極大値とみなすか",
     "peak": "リードの終端の数がいくつ以上のとき、ピークとみなすか",
     "cut": "リピート領域の切断位置をそれぞれ何bp以上離すか",
+}
 ```
 
 出力として、"output"で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), top.fa, repeat.fa,top_vs_reads_sorted.bam,rep_vs_rep.paf,strong_mask.paf,weak_mask.paf,read_masked.faが入る。この中のrepeat.faがrepeatのデータベースとなる。

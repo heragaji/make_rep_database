@@ -10,7 +10,7 @@ top_id = subprocess.check_output('seqkit seq -ni {output}/top.fa'.format(output=
 for id in top_id:
     os.makedirs(config['output']+"/"+id, exist_ok=True)
 src_dir = srcdir("src")
-print(src_dir)
+
 rule all:
     input:
         config['output']+"/read_masked.fa",
@@ -207,5 +207,5 @@ rule read_mask:
         data = config['data']
     shell:
         """
-        touch {output}
+        python {src_dir}/read_mask.py {params.data} {input.strong} {output}
         """
