@@ -19,9 +19,10 @@ def main():
     with open(fasta_out,"w") as outf:
         for record in SeqIO.parse(fasta_in, 'fasta'):
             if record.id in d:
+                masked_seq = record.seq
                 for start_end in d[record.id]:
                     aligned = str(record.seq)[start_end[0]:start_end[1]].lower()
-                    masked_seq = record.seq[:start_end[0]] + aligned + record.seq[start_end[1]+1:]
+                    masked_seq = masked_seq[:start_end[0]] + aligned + masked_seq[start_end[1]+1:]
                 record.seq = masked_seq
             SeqIO.write(record,outf,"fasta")
 
