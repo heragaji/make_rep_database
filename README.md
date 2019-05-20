@@ -66,7 +66,7 @@ JSONファイルの中身は、
 }
 ```
 
-出力として、"output"で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), top.fa, repeat.fa,top_vs_reads_sorted.bam,rep_vs_rep.paf,strong_mask.paf,weak_mask.paf,read_masked.faが入る。この中のrepeat.faがrepeatのデータベースとなる。
+出力として、"output"で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), top.fa, repeat.fa,top_vs_reads_sorted.bam,rep_vs_rep.paf,strong.paf,weak.paf,read_masked.faが入る。この中のrepeat.faがrepeatのデータベースとなる。
 作業ディレクトリには.snakemakeフォルダ(snakemakeのログ等が入る)が入る。
 `--cores int`,`--qsub int`等でコア数とジョブの投入のオプションもできる。
 
