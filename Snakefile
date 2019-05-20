@@ -9,10 +9,14 @@ subprocess.call("seqkit sort -lr {reads_data} | seqkit head -n {top} > {output}/
 top_id = subprocess.check_output('seqkit seq -ni {output}/top.fa'.format(output=config['output']),shell = True).decode(encoding='utf-8').split()
 for id in top_id:
     os.makedirs(config['output']+"/"+id, exist_ok=True)
-
+src_dir = srcdir("src")
+print(src_dir)
 rule all:
     input:
-        config['output']+"/cluster_size.csv"
+        config['output']+"/read_masked.fa",
+        config['output']+"/weak_mask.paf",
+        config['output']+"/rep_vs_rep.paf"
+
 
 rule minialign:
     input:
@@ -69,10 +73,9 @@ rule make_consensus:
         config['output']+"/{ref}/consensus_{ref}_vs_reads_realigned.fa"
     params:
         dir = config['output'],
-        src_dir = config['src_dir']
     shell:
         """
-        python {params.src_dir}/count_to_consensus.py -s {wildcards.ref} -f {input} -g True > {output}
+        python {src_dir}/count_to_consensus.py -s {wildcards.ref} -f {input} -g True > {output}
         """
 
 rule coverage:
@@ -80,11 +83,9 @@ rule coverage:
         config['output']+"/{ref}/{ref}_vs_reads_realigned.bam"
     output:
         config['output']+"/{ref}/{ref}_vs_reads_depth.txt"
-    params:
-        src_dir = config['src_dir']
     shell:
         """
-        python {params.src_dir}/bam-alignment_coverage.py {input} > {output}
+        python {src_dir}/bam-alignment_coverage.py {input} > {output}
         """
 
 rule region:
@@ -94,10 +95,9 @@ rule region:
          config['output']+"/{ref}/{ref}_vs_reads_region.txt"
      params:
          cov = config['coverage'],
-         src_dir = config['src_dir']
      shell:
          """
-         python {params.src_dir}/depth-high_coverage.py {input}  {params.cov} > {output}
+         python {src_dir}/depth-high_coverage.py {input}  {params.cov} > {output}
          """
 
 rule terminal:
@@ -105,11 +105,9 @@ rule terminal:
         config['output']+"/{ref}/{ref}_vs_reads_realigned.bam"
     output:
         config['output']+"/{ref}/{ref}_vs_reads_terminal.tsv"
-    params:
-        src_dir = config['src_dir']
     shell:
         """
-        python {params.src_dir}/bam-alignment_terminal.py {input} > {output}
+        python {src_dir}/bam-alignment_terminal.py {input} > {output}
         """
 
 rule peak:
@@ -120,10 +118,9 @@ rule peak:
     params:
         interval = config['interval'],
         peak = config['peak'],
-        src_dir = config['src_dir']
     shell:
         """
-        python {params.src_dir}/terminal-find_peaks.py {input} {params.interval} {params.peak} > {output}
+        python {src_dir}/terminal-find_peaks.py {input} {params.interval} {params.peak} > {output}
         """
 
 rule cut:
@@ -134,10 +131,9 @@ rule cut:
         config['output']+"/{ref}/{ref}_vs_reads_cut.bed"
     params:
         cut = config['cut'],
-        src_dir = config['src_dir']
     shell:
         """
-        python {params.src_dir}/peak-cut_region.py {input.region} {input.peak} {params.cut} > {output}
+        python {src_dir}/peak-cut_region.py {input.region} {input.peak} {params.cut} > {output}
         """
 
 rule gapped_result:
@@ -160,11 +156,9 @@ rule each_result:
         config['output']+"/{ref}/{ref}_vs_reads_result_gapped.fa"
     output:
         config['output']+"/{ref}/{ref}_vs_reads_result.fa"
-    params:
-        src_dir = config['src_dir']
     shell:
         """
-        python {params.src_dir}/remove_gap_from_fasta.py {input} > {output}
+        python {src_dir}/remove_gap_from_fasta.py {input} > {output}
         """
 
 rule repeat:
@@ -178,14 +172,40 @@ rule repeat:
          cat {input} >> {output}
          """
 
-rule cluster:
+rule rep_vs_rep:
     input:
         config['output']+"/repeat.fa"
     output:
-        config['output']+"/cluster_size.csv"
-    params:
-        src_dir = config['src_dir']
+        config['output']+"/rep_vs_rep.paf"
+    threads: 16
     shell:
         """
-        python {params.src_dir}/cal_cluster_size.py {input} > {output}
+        minialign -O paf {input} {input}  -t{threads} > {output}
+        """
+
+rule rep_vs_read:
+    input:
+        config['output']+"/repeat.fa"
+    output:
+        strong = config['output']+"/strong_mask.paf",
+        weak = config['output']+"/weak_mask.paf"
+    params:
+        data = config['data']
+    threads: 16
+    shell:
+        """
+        minialign -O paf {params.data} {input}  -t{threads} > {output.strong}
+        minialign -O paf {params.data} {input}  -t{threads} > {output.weak}
+        """
+rule read_mask:
+    input:
+        strong = config['output']+"/strong_mask.paf",
+        repeat = config['output']+"/repeat.fa"
+    output:
+        config['output']+"/read_masked.fa"
+    params:
+        data = config['data']
+    shell:
+        """
+        touch {output}
         """

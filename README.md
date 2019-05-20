@@ -4,7 +4,7 @@ program of detecting and clustering repeat sequences from reads.
 
 ## Description
 
-`make_rep_database` detects and classifies the repeat sequences from reads in FASTA file, and outputs the repeat databases with FASTA format.
+`make_rep_database` detects and classifies the repeat sequences from reads in FASTA file, and outputs the repeat databases with FASTA/FASTQ format.
 
 ## Requirement
 
@@ -44,9 +44,9 @@ realignerとdump-consensusの設定は、ラボ内DocBase参照。
 
 ## Usage
 
-Snakefileのあるディレクトリで、以下のコマンド。
+以下のコマンド。
 
-`snakemake --directory working_directory`
+`snakemake --snakefile [snakefile_path] --directory [working_directory_path]`
 
 作業ディレクトリに、`config.json`という名前のJSONファイルを作成する。  
 JSONファイルの中身は、
@@ -63,16 +63,11 @@ JSONファイルの中身は、
     "interval": "何bp内のリードの終端のカバレッジを極大値とみなすか",
     "peak": "リードの終端の数がいくつ以上のとき、ピークとみなすか",
     "cut": "リピート領域の切断位置をそれぞれ何bp以上離すか",
-    "src_dir": "Snakefileと同じ位置にある、srcフォルダを指定(絶対パス)"
-}
 ```
 
-出力として、"output"で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), cluster_size.csv, top.fa, repeat.fa,top_vs_reads_sorted.bamが入る。この中のrepeat.faがrepeatのデータベースとなる。  
-今のところ、clusterのサイズは全て0.01になっている。  
-作業ディレクトリには.snakemake(snakemakeのログ等が入る)が入る。
-
-Snakefile自体のパスをプログラム内で得られれば、最後の"src_dir"はいらないので、なんとかしたい。
-`--cores int`,`--qsub int`等でコア数やジョブの投入のオプションもできる。
+出力として、"output"で指定したディレクトリに、topで使われた各リードの名前のフォルダ(中間ファイルが入っている), top.fa, repeat.fa,top_vs_reads_sorted.bam,rep_vs_rep.paf,strong_mask.paf,weak_mask.paf,read_masked.faが入る。この中のrepeat.faがrepeatのデータベースとなる。
+作業ディレクトリには.snakemakeフォルダ(snakemakeのログ等が入る)が入る。
+`--cores int`,`--qsub int`等でコア数とジョブの投入のオプションもできる。
 
 ## Installation
 
