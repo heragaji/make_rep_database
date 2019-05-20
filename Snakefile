@@ -14,7 +14,7 @@ src_dir = srcdir("src")
 rule all:
     input:
         config['output']+"/read_masked.fa",
-        config['output']+"/weak_mask.paf",
+        config['output']+"/weak.paf",
         config['output']+"/rep_vs_rep.paf"
 
 
@@ -187,8 +187,8 @@ rule rep_vs_read:
     input:
         config['output']+"/repeat.fa"
     output:
-        strong = config['output']+"/strong_mask.paf",
-        weak = config['output']+"/weak_mask.paf"
+        strong = config['output']+"/strong.paf",
+        weak = config['output']+"/weak.paf"
     params:
         data = config['data']
     threads: 16
@@ -199,7 +199,7 @@ rule rep_vs_read:
         """
 rule read_mask:
     input:
-        strong = config['output']+"/strong_mask.paf",
+        strong = config['output']+"/strong.paf",
         repeat = config['output']+"/repeat.fa"
     output:
         config['output']+"/read_masked.fa"
