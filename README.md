@@ -70,6 +70,16 @@ JSONファイルの中身は、
 作業ディレクトリには.snakemakeフォルダ(snakemakeのログ等が入る)が入る。
 `--cores int`,`--qsub int`等でコア数とジョブの投入のオプションもできる。
 
+realignerの実行には時間がかかるため、パラメータ`coverage`,`interval`,`peak`,`cut`のみを変えて実験することができるように、ワークフローを分割した。(branch `devide`で利用できる)
+上の4つのパラメータのみを変えた結果を見たいときは、config.jsonの各パラメータを書き換え、
+
+```sh
+snakemake --snakefile [make_rep_database_path/after_realigner/Snakefile] --directory [working_directory_path]  --forceall
+```
+
+を実行することで、パラメータを変えたときの結果に各ファイルが更新される。
+
+
 ## Installation
 
     $ git clone https://github.com/heragaji/make_rep_database.git
