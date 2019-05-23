@@ -19,8 +19,6 @@ rule all:
 
 
 rule minialign:
-    input:
-        top = config['output']+"/top.fa"
     output:
         config['output']+"/top_vs_reads_sorted.bam"
     params:
@@ -28,7 +26,7 @@ rule minialign:
     threads: 16
     shell:
         """
-        minialign -x pacbio -f 0 -m 0.00001 {input.top} {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
+        minialign -x pacbio -f 0 -m 0.00001 {config['output']}/top.fa {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
         """
 
 rule realigner:
