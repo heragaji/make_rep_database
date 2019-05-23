@@ -15,7 +15,7 @@ program of detecting and clustering repeat sequences from reads.
 
 realignerとdump-consensusの設定は、ラボ内DocBase参照。
 
-- realigner commit-number: 1b80e94e8139b6fa710876044651bc17b0405d06
+- realigner commit-number: d26f40970f705fde4167ef119402df3330e82fb2
 
 - dump-consensus commit-number: a7733b5e0d89c7536f72c3f4e1d5a0c7747d013f
 
