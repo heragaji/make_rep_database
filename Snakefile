@@ -13,9 +13,9 @@ src_dir = srcdir("src")
 
 rule all:
     input:
-        config['output']+"/read_masked.fa",
-        config['output']+"/weak.paf",
-        config['output']+"/rep_vs_rep.paf"
+        config['output']+"/read_masked_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa",
+        config['output']+"/weak_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".paf",
+        config['output']+"/rep_vs_rep_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".paf"
 
 
 rule minialign:
@@ -26,20 +26,18 @@ rule minialign:
     threads: 16
     shell:
         """
-        minialign -x pacbio -f 0 -m 0.00001 {config['output']}/top.fa {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
+        minialign -x pacbio -f 0 -m 0.00001 {config[output]}/top.fa {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
         """
 
 rule realigner:
     input:
         bam = config['output']+"/top_vs_reads_sorted.bam"
     output:
-        config['output']+"/{ref}/{ref}_vs_reads_realigned.bam"
+        config['output']+"/{ref}/{ref}_vs_reads_realigned_it"+config['iteration']+".bam"
     params:
         realigner = config['realigner'],
         it = config['iteration'],
         dir = config['output'],
-        top_fa = config['output']+"/top.fa"
-
     shell:
         """
         if test -e {params.dir}/{wildcards.ref}/hoge; then
@@ -47,16 +45,16 @@ rule realigner:
         fi
         mkfifo {params.dir}/{wildcards.ref}/hoge
         samtools view -h {input.bam} > {params.dir}/{wildcards.ref}/hoge &
-        STACK_YAML={params.realigner}/stack.yaml stack exec -- realigner -i {params.it} {wildcards.ref} < {params.dir}/{wildcards.ref}/hoge | samtools view -Sb | samtools sort >  {params.dir}/{wildcards.ref}/{wildcards.ref}_vs_reads_realigned.bam
+        STACK_YAML={params.realigner}/stack.yaml stack exec -- realigner -i {params.it} {wildcards.ref} < {params.dir}/{wildcards.ref}/hoge | samtools view -Sb | samtools sort >  {output}
         rm {params.dir}/{wildcards.ref}/hoge
         """
 
 
 rule dump_consensus:
     input:
-        config['output']+"/{ref}/{ref}_vs_reads_realigned.bam"
+        config['output']+"/{ref}/{ref}_vs_reads_realigned_it"+config['iteration']+".bam"
     output:
-        config['output']+"/{ref}/{ref}_vs_reads_realigned_count.tsv"
+        config['output']+"/{ref}/{ref}_vs_reads_realigned_count_it"+config['iteration']+".tsv"
     params:
         dump_dir = config['dump_consensus']
     shell:
@@ -66,9 +64,9 @@ rule dump_consensus:
 
 rule make_consensus:
     input:
-        config['output']+"/{ref}/{ref}_vs_reads_realigned_count.tsv"
+        config['output']+"/{ref}/{ref}_vs_reads_realigned_count_it"+config['iteration']+".tsv"
     output:
-        config['output']+"/{ref}/consensus_{ref}_vs_reads_realigned.fa"
+        config['output']+"/{ref}/consensus_{ref}_vs_reads_realigned_it"+config['iteration']+".fa"
     params:
         dir = config['output'],
     shell:
@@ -78,9 +76,9 @@ rule make_consensus:
 
 rule coverage:
     input:
-        config['output']+"/{ref}/{ref}_vs_reads_realigned.bam"
+        config['output']+"/{ref}/{ref}_vs_reads_realigned_it"+config['iteration']+".bam"
     output:
-        config['output']+"/{ref}/{ref}_vs_reads_depth.txt"
+        config['output']+"/{ref}/{ref}_vs_reads_depth_it"+config['iteration']+".txt"
     shell:
         """
         python {src_dir}/bam-alignment_coverage.py {input} > {output}
@@ -88,9 +86,9 @@ rule coverage:
 
 rule region:
      input:
-         config['output']+"/{ref}/{ref}_vs_reads_depth.txt"
+         config['output']+"/{ref}/{ref}_vs_reads_depth_it"+config['iteration']+".txt"
      output:
-         config['output']+"/{ref}/{ref}_vs_reads_region.txt"
+         config['output']+"/{ref}/{ref}_vs_reads_region_it"+config['iteration']+"_cov"+config['coverage']+".txt"
      params:
          cov = config['coverage'],
      shell:
@@ -100,9 +98,9 @@ rule region:
 
 rule terminal:
     input:
-        config['output']+"/{ref}/{ref}_vs_reads_realigned.bam"
+        config['output']+"/{ref}/{ref}_vs_reads_realigned_it"+config['iteration']+".bam"
     output:
-        config['output']+"/{ref}/{ref}_vs_reads_terminal.tsv"
+        config['output']+"/{ref}/{ref}_vs_reads_terminal_it"+config['iteration']+".tsv"
     shell:
         """
         python {src_dir}/bam-alignment_terminal.py {input} > {output}
@@ -110,9 +108,9 @@ rule terminal:
 
 rule peak:
     input:
-        config['output']+"/{ref}/{ref}_vs_reads_terminal.tsv"
+        config['output']+"/{ref}/{ref}_vs_reads_terminal_it"+config['iteration']+".tsv"
     output:
-        config['output']+"/{ref}/{ref}_vs_reads_peak.txt"
+        config['output']+"/{ref}/{ref}_vs_reads_peak_it"+config['iteration']+"_int"+config['interval']+"_pe"+config['peak']+".txt"
     params:
         interval = config['interval'],
         peak = config['peak'],
@@ -123,10 +121,10 @@ rule peak:
 
 rule cut:
     input:
-        region = config['output']+"/{ref}/{ref}_vs_reads_region.txt",
-        peak = config['output']+"/{ref}/{ref}_vs_reads_peak.txt"
+        region = config['output']+"/{ref}/{ref}_vs_reads_region_it"+config['iteration']+"_cov"+config['coverage']+".txt",
+        peak = config['output']+"/{ref}/{ref}_vs_reads_peak_it"+config['iteration']+"_int"+config['interval']+"_pe"+config['peak']+".txt"
     output:
-        config['output']+"/{ref}/{ref}_vs_reads_cut.bed"
+        config['output']+"/{ref}/{ref}_vs_reads_cut_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".bed"
     params:
         cut = config['cut'],
     shell:
@@ -136,10 +134,10 @@ rule cut:
 
 rule gapped_result:
      input:
-         bed = config['output']+"/{ref}/{ref}_vs_reads_cut.bed",
-         consensus = config['output']+"/{ref}/consensus_{ref}_vs_reads_realigned.fa"
+         bed = config['output']+"/{ref}/{ref}_vs_reads_cut_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".bed",
+         consensus = config['output']+"/{ref}/consensus_{ref}_vs_reads_realigned_it"+config['iteration']+".fa"
      output:
-         config['output']+"/{ref}/{ref}_vs_reads_result_gapped.fa"
+         config['output']+"/{ref}/{ref}_vs_reads_result_gapped_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa"
      shell:
          """
          if [ -s {input.bed} ] ;then
@@ -151,9 +149,9 @@ rule gapped_result:
 
 rule each_result:
     input:
-        config['output']+"/{ref}/{ref}_vs_reads_result_gapped.fa"
+        config['output']+"/{ref}/{ref}_vs_reads_result_gapped_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa"
     output:
-        config['output']+"/{ref}/{ref}_vs_reads_result.fa"
+        config['output']+"/{ref}/{ref}_vs_reads_result_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa"
     shell:
         """
         python {src_dir}/remove_gap_from_fasta.py {input} > {output}
@@ -161,9 +159,9 @@ rule each_result:
 
 rule repeat:
      input:
-         expand(config['output']+"/{ref}/{ref}_vs_reads_result.fa",ref=top_id)
+         expand(config['output']+"/{ref}/{ref}_vs_reads_result_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa",ref=top_id)
      output:
-         config['output']+"/repeat.fa"
+         config['output']+"/repeat_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa"
      shell:
          """
          touch {output}
@@ -172,9 +170,9 @@ rule repeat:
 
 rule rep_vs_rep:
     input:
-        config['output']+"/repeat.fa"
+        config['output']+"/repeat_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa"
     output:
-        config['output']+"/rep_vs_rep.paf"
+        config['output']+"/rep_vs_rep_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".paf"
     threads: 16
     shell:
         """
@@ -183,10 +181,10 @@ rule rep_vs_rep:
 
 rule rep_vs_read:
     input:
-        config['output']+"/repeat.fa"
+        config['output']+"/repeat_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa"
     output:
-        strong = config['output']+"/strong.paf",
-        weak = config['output']+"/weak.paf"
+        strong = config['output']+"/strong_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".paf",
+        weak = config['output']+"/weak_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".paf"
     params:
         data = config['data']
     threads: 16
@@ -197,10 +195,10 @@ rule rep_vs_read:
         """
 rule read_mask:
     input:
-        strong = config['output']+"/strong.paf",
-        repeat = config['output']+"/repeat.fa"
+        strong = config['output']+"/strong_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".paf",
+        repeat = config['output']+"/repeat_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa"
     output:
-        config['output']+"/read_masked.fa"
+        config['output']+"/read_masked_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+".fa"
     params:
         data = config['data']
     shell:
