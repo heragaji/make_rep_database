@@ -4,7 +4,7 @@ program of detecting and clustering repeat sequences from reads.
 
 ## Description
 
-`make_rep_database` detects and classifies the repeat sequences from reads in FASTA file, and outputs the repeat databases with FASTA/FASTQ format.
+`make_rep_database` detects and classifies the repeat sequences from reads in FASTA file, and outputs the repeat databases with FASTA format.
 
 ## Requirement
 
