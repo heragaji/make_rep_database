@@ -5,8 +5,8 @@ import os
 configfile:
     "config.json"
 
-subprocess.call("seqkit sort -lr {reads_data} | seqkit head -n {top} > {output}/top.fa".format(reads_data=config['data'],top=config['top'],output=config['output']),shell = True)
-top_id = subprocess.check_output('seqkit seq -ni {output}/top.fa'.format(output=config['output']),shell = True).decode(encoding='utf-8').split()
+subprocess.call("seqkit sort -lr {reads_data} | seqkit head -n {top} > {output}/top{top}.fa".format(reads_data=config['data'],top=config['top'],output=config['output']),shell = True)
+top_id = subprocess.check_output('seqkit seq -ni {output}/top{top}.fa'.format(output=config['output'],top=config['top']),shell = True).decode(encoding='utf-8').split()
 for id in top_id:
     os.makedirs(config['output']+"/"+id, exist_ok=True)
 src_dir = srcdir("src")
@@ -15,20 +15,43 @@ rule all:
     input:
         config['output']+"/repeat_top"+config['top']+"_it"+config['iteration']+"_cov"+config['coverage']+"_int"+config['interval']+"_pe"+config['peak']+"_cut"+config['cut']+".fa"
 
-rule minialign:
+# rule minialign:
+#     output:
+#         config['output']+"/top_vs_reads_sorted_top"+config['top']+".bam"
+#     params:
+#         data = config['data']
+#     threads: 16
+#     shell:
+#         """
+#         minialign -x pacbio -f 0 -m 0.00001 {config[output]}/top.fa {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
+#         """
+rule split_fasta:
+    input:
+        config['output']+"/top"+config['top']+".fa"
     output:
-        config['output']+"/top_vs_reads_sorted_top"+config['top']+".bam"
+        config['output']+"/split"
+    shell:
+        """
+        python {src_dir}/split_fasta.py {input} {config[output]} {config[top]} > {output}
+        """
+
+rule minialign:
+    input:
+        tmp=config['output']+"/split",
+    output:
+        config['output']+"/{ref}/top_vs_reads_sorted_top"+config['top']+"_{ref}.bam"
     params:
-        data = config['data']
+        data = config['data'],
+        ref = config['output']+"/{ref}/top"+config['top']+"_{ref}.fa"
     threads: 16
     shell:
         """
-        minialign -x pacbio -f 0 -m 0.00001 {config[output]}/top.fa {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
+        minialign -x pacbio -f 0 -m 0.00001 {params.ref} {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
         """
 
 # rule realigner:
 #     input:
-#         bam = config['output']+"/top_vs_reads_sorted_top"+config['top']+".bam"
+#         config['output']+"/{ref}/top_vs_reads_sorted_top"+config['top']+"_{ref}.bam"
 #     output:
 #         config['output']+"/{ref}/{ref}_vs_reads_realigned_top"+config['top']+"_it"+config['iteration']+".bam"
 #     params:
@@ -41,7 +64,7 @@ rule minialign:
 #             rm {params.dir}/{wildcards.ref}/hoge
 #         fi
 #         mkfifo {params.dir}/{wildcards.ref}/hoge
-#         samtools view -h {input.bam} > {params.dir}/{wildcards.ref}/hoge &
+#         samtools view -h {input} > {params.dir}/{wildcards.ref}/hoge &
 #         STACK_YAML={params.realigner}/stack.yaml stack exec -- realigner -i {params.it} {wildcards.ref} < {params.dir}/{wildcards.ref}/hoge | samtools view -Sb | samtools sort >  {output}
 #         rm {params.dir}/{wildcards.ref}/hoge
 #         """
@@ -49,7 +72,7 @@ rule minialign:
 
 rule dump_consensus:
     input:
-        config['output']+"/top_vs_reads_sorted_top"+config['top']+".bam"
+        config['output']+"/{ref}/top_vs_reads_sorted_top"+config['top']+"_{ref}.bam"
     output:
         config['output']+"/{ref}/{ref}_vs_reads_realigned_count_top"+config['top']+"_it"+config['iteration']+".tsv"
     params:
@@ -73,7 +96,7 @@ rule make_consensus:
 
 rule coverage:
     input:
-        config['output']+"/top_vs_reads_sorted_top"+config['top']+".bam"
+        config['output']+"/{ref}/top_vs_reads_sorted_top"+config['top']+"_{ref}.bam"
     output:
         config['output']+"/{ref}/{ref}_vs_reads_depth_top"+config['top']+"_it"+config['iteration']+".txt"
     shell:
@@ -95,7 +118,7 @@ rule region:
 
 rule terminal:
     input:
-        config['output']+"/top_vs_reads_sorted_top"+config['top']+".bam"
+        config['output']+"/{ref}/top_vs_reads_sorted_top"+config['top']+"_{ref}.bam"
     output:
         config['output']+"/{ref}/{ref}_vs_reads_terminal_top"+config['top']+"_it"+config['iteration']+".tsv"
     shell:
