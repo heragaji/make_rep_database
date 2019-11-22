@@ -46,30 +46,30 @@ rule minialign:
         minialign -x pacbio -f 0 -m 0.00001 {params.ref} {params.data}  -t{threads} | samtools view -Sb -F 4 | samtools sort > {output}
         """
 
-# rule realigner:
-#     input:
-#         rules.minialign.output
-#     output:
-#         config['output']+"/{ref}/{ref}_vs_reads_realigned_top"+config['top']+"_it"+config['iteration']+".bam"
-#     params:
-#         realigner = config['realigner'],
-#         it = config['iteration'],
-#         dir = config['output'],
-#     shell:
-#         """
-#         if test -e {params.dir}/{wildcards.ref}/hoge; then
-#             rm {params.dir}/{wildcards.ref}/hoge
-#         fi
-#         mkfifo {params.dir}/{wildcards.ref}/hoge
-#         samtools view -h {input} > {params.dir}/{wildcards.ref}/hoge &
-#         STACK_YAML={params.realigner}/stack.yaml stack exec -- realigner -i {params.it} {wildcards.ref} < {params.dir}/{wildcards.ref}/hoge | samtools view -Sb | samtools sort >  {output}
-#         rm {params.dir}/{wildcards.ref}/hoge
-#         """
+rule realigner:
+    input:
+        rules.minialign.output
+    output:
+        config['output']+"/{ref}/{ref}_vs_reads_realigned_top"+config['top']+"_it"+config['iteration']+".bam"
+    params:
+        realigner = config['realigner'],
+        it = config['iteration'],
+        dir = config['output'],
+    shell:
+        """
+        if test -e {params.dir}/{wildcards.ref}/hoge; then
+            rm {params.dir}/{wildcards.ref}/hoge
+        fi
+        mkfifo {params.dir}/{wildcards.ref}/hoge
+        samtools view -h {input} > {params.dir}/{wildcards.ref}/hoge &
+        STACK_YAML={params.realigner}/stack.yaml stack exec -- realigner -i {params.it} {wildcards.ref} < {params.dir}/{wildcards.ref}/hoge | samtools view -Sb | samtools sort >  {output}
+        rm {params.dir}/{wildcards.ref}/hoge
+        """
 
 
 rule dump_consensus:
     input:
-        rules.minialign.output
+        rules.realigner.output
     output:
         config['output']+"/{ref}/{ref}_vs_reads_realigned_count_top"+config['top']+"_it"+config['iteration']+".tsv"
     params:
@@ -93,7 +93,7 @@ rule make_consensus:
 
 rule coverage:
     input:
-        rules.minialign.output
+        rules.realigner.output
     output:
         config['output']+"/{ref}/{ref}_vs_reads_depth_top"+config['top']+"_it"+config['iteration']+".txt"
     shell:
@@ -115,7 +115,7 @@ rule region:
 
 rule terminal:
     input:
-        rules.minialign.output
+        rules.realigner.output
     output:
         config['output']+"/{ref}/{ref}_vs_reads_terminal_top"+config['top']+"_it"+config['iteration']+".tsv"
     shell:
